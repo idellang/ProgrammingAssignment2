@@ -1,0 +1,137 @@
+---
+title: "xx"
+author: "Me"
+date: "12/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+makeCacheMatrix <- function(x = matrix()) {
+  #initialize null inverse
+  i <- NULL
+  
+  #set function for setting the matrix
+  set <- function(y){
+      
+      x <<- y
+      #if a matrix is set, make the inverse NULL
+      i <<- NULL
+  }
+   
+  #set function to get matrix 
+  get <- function() x
+  
+  ##set inverse of the matrix using an input
+  set_inverse <- function(inverse) i <<- inverse
+  
+  
+  #get the inverse
+  get_inverse <- function() i
+    
+  #return list of functions
+  list(set = set, get = get, set_inverse = set_inverse, get_inverse = get_inverse)
+  
+}
+```
+
+```{r}
+cacheSolve <- function(x, ...) {
+    # get the inverse value to m
+    m <- x$get_inverse()
+    
+    #check if m is not null then just return it
+    if(!is.null(m)) {
+        message("getting cached data")
+        return(m)
+    }
+    
+    #if there is no inverse get the data
+    data <- x$get()
+    
+    #solve the inverse matrix
+    m <- solve(data)
+    
+    #set the inverse using set_inverse
+    x$set_inverse(m)
+    m
+    
+}
+```
+
+```{r}
+sample_mat = matrix(c(4,3, 3,2), 2,2)
+solve(sample_mat) %*% sample_mat
+sample_set = matrix(c(5,5, 5,5), 2,2)
+```
+
+```{r}
+x = makeCacheMatrix(sample_mat)
+x$set_inverse(sample_set)
+x$get_inverse()
+
+cacheSolve(x)
+x$set(sample_mat)
+x$get_inverse()
+x$set(sample_mat)
+cacheSolve(x)
+x$get_inverse()
+x$get() %*% x$get_inverse()
+```
+
+```{r}
+makeVector <- function(x = numeric()) {
+        m <- NULL
+        set <- function(y) {
+                x <<- y
+                m <<- NULL
+        }
+        get <- function() x
+        setmean <- function(mean) m <<- mean
+        getmean <- function() m
+        list(set = set, get = get,
+             setmean = setmean,
+             getmean = getmean)
+}
+```
+
+```{r}
+cachemean <- function(x, ...) {
+        m <- x$getmean()
+        if(!is.null(m)) {
+                message("getting cached data")
+                return(m)
+        }
+        data <- x$get()
+        m <- mean(data, ...)
+        x$setmean(m)
+        m
+}
+```
+
+```{r}
+x = makeVector(c(1,2,4,5,6))
+x$get()
+x$getmean()
+x$setmean()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
